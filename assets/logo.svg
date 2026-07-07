@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="krot-logo-title">
+  <title id="krot-logo-title">krot</title>
+
+  <!-- body / head — one rounded silhouette -->
+  <path d="M120 18
+           C 58 18, 22 74, 22 130
+           C 22 186, 62 222, 120 222
+           C 178 222, 218 186, 218 130
+           C 218 74, 182 18, 120 18 Z"
+        fill="#463225"/>
+
+  <!-- lighter belly patch -->
+  <ellipse cx="120" cy="158" rx="56" ry="50" fill="#6b4e3b"/>
+
+  <!-- vestigial closed eyes (moles are functionally blind) -->
+  <path d="M74 108 Q 84 100 94 108"
+        stroke="#1a0f08" stroke-width="5"
+        stroke-linecap="round" fill="none"/>
+  <path d="M146 108 Q 156 100 166 108"
+        stroke="#1a0f08" stroke-width="5"
+        stroke-linecap="round" fill="none"/>
+
+  <!-- muzzle -->
+  <path d="M88 138
+           C 96 168, 144 168, 152 138
+           C 144 154, 96 154, 88 138 Z"
+        fill="#3a2a1f"/>
+
+  <!-- nose -->
+  <ellipse cx="120" cy="146" rx="13" ry="10" fill="#e89a9a"/>
+  <ellipse cx="120" cy="144" rx="6" ry="4" fill="#2a1508"/>
+
+  <!-- left digging paw -->
+  <g stroke="#2a1508" stroke-width="3" stroke-linecap="round">
+    <path d="M34 148
+             C 6 158, 4 202, 32 212
+             C 58 220, 74 196, 62 170
+             C 56 156, 46 148, 34 148 Z"
+          fill="#e89a9a"/>
+    <path d="M14 200 L 8 222"/>
+    <path d="M28 212 L 26 232"/>
+    <path d="M44 214 L 48 232"/>
+  </g>
+
+  <!-- right digging paw -->
+  <g stroke="#2a1508" stroke-width="3" stroke-linecap="round">
+    <path d="M206 148
+             C 234 158, 236 202, 208 212
+             C 182 220, 166 196, 178 170
+             C 184 156, 194 148, 206 148 Z"
+          fill="#e89a9a"/>
+    <path d="M226 200 L 232 222"/>
+    <path d="M212 212 L 214 232"/>
+    <path d="M196 214 L 192 232"/>
+  </g>
+</svg>

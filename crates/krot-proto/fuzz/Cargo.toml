@@ -1,0 +1,39 @@
+[package]
+name = "krot-proto-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+krot-proto = { path = ".." }
+
+# Fuzz targets are `[[bin]]`s manually declared here so cargo-fuzz
+# picks them up.
+[[bin]]
+name = "mux_header_decode"
+path = "fuzz_targets/mux_header_decode.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "client_frame_decode"
+path = "fuzz_targets/client_frame_decode.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "server_frame_decode"
+path = "fuzz_targets/server_frame_decode.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]
+# Exclude from the parent workspace — cargo-fuzz builds this
+# standalone with the sanitizer runtime.

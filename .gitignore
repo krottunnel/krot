@@ -1,0 +1,43 @@
+# =============================================================
+# Rust / Cargo
+# =============================================================
+/target/
+**/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# =============================================================
+# Internal / maintainer-only docs (protocol spec, playbooks).
+# Kept locally, never pushed. Public docs are at repo root.
+# =============================================================
+/internal/
+
+# =============================================================
+# Runtime state (identity, ACME cache, admin_token, tunnel data)
+# =============================================================
+/var/
+/data/
+authorized_keys
+peers.txt
+identity
+admin_token.hash
+*.pem
+*.key
+
+# =============================================================
+# Soak / load test output
+# =============================================================
+/krot-soak-out/
+/scripts/soak/env
+
+# =============================================================
+# Editor / IDE / OS
+# =============================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/
+*.swp
+*.swo
+*~

@@ -1,0 +1,27 @@
+[package]
+name         = "krot-transport"
+description  = "QUIC transport layer for the KROT tunnel protocol."
+version      = { workspace = true }
+edition      = { workspace = true }
+rust-version = { workspace = true }
+license      = { workspace = true }
+repository   = { workspace = true }
+
+[lints]
+workspace = true
+
+[dependencies]
+krot-proto = { workspace = true }
+tokio      = { workspace = true }
+quinn      = { workspace = true }
+rustls     = { workspace = true }
+serde      = { workspace = true }
+postcard   = { workspace = true }
+bytes      = { workspace = true }
+tracing    = { workspace = true }
+thiserror  = { workspace = true }
+tokio-rustls = { workspace = true }
+
+[dev-dependencies]
+rcgen = { workspace = true }
+tokio = { workspace = true, features = ["test-util", "time", "macros"] }

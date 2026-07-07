@@ -1,0 +1,104 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+  # Deeper proptest sweep in CI than the default 256 cases.
+  PROPTEST_CASES: 1024
+
+jobs:
+  # ------------------------------------------------------------------
+  # Style + lint + tests on stable, matrix on Linux + macOS.
+  # ------------------------------------------------------------------
+  test:
+    name: test / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo fmt --check
+        run: cargo fmt --all -- --check
+      - name: cargo clippy (strict)
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: cargo test
+        run: cargo test --workspace --all-features
+
+  # ------------------------------------------------------------------
+  # MSRV pin: same steps, but with the rust-toolchain.toml version.
+  # Ensures we don't accidentally bump the minimum supported Rust.
+  # ------------------------------------------------------------------
+  msrv:
+    name: msrv (${{ matrix.rust }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: ["1.80.0"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --workspace --locked
+
+  # ------------------------------------------------------------------
+  # Security audit — dependency CVEs. Runs on push AND weekly on cron
+  # (in a separate audit.yml would be cleaner; kept here for locality).
+  # ------------------------------------------------------------------
+  audit:
+    name: cargo audit
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: install cargo-audit
+        run: cargo install cargo-audit --locked
+      - run: cargo audit
+
+  # ------------------------------------------------------------------
+  # Fuzz smoke — nightly toolchain, cargo-fuzz targets, 60s per target.
+  # This is NOT a real fuzz session — it just ensures every target
+  # still compiles and runs. Real fuzzing is a manual `cargo +nightly
+  # fuzz run <target>`.
+  # ------------------------------------------------------------------
+  fuzz-smoke:
+    name: fuzz smoke (${{ matrix.crate }}/${{ matrix.target }})
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - crate: krot-proto
+            target: mux_header_decode
+          - crate: krot-proto
+            target: client_frame_decode
+          - crate: krot-proto
+            target: server_frame_decode
+          - crate: krot-server
+            target: authorized_keys_parse
+          - crate: krot-server
+            target: tls_client_hello
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@nightly
+      - uses: Swatinem/rust-cache@v2
+      - name: install cargo-fuzz
+        run: cargo install cargo-fuzz --locked
+      - name: run 60s smoke
+        working-directory: crates/${{ matrix.crate }}/fuzz
+        run: cargo +nightly fuzz run ${{ matrix.target }} -- -max_total_time=60

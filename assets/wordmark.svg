@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 240" role="img" aria-labelledby="krot-wordmark-title">
+  <title id="krot-wordmark-title">krot</title>
+
+  <!-- ==================== mole ==================== -->
+  <g>
+    <path d="M120 18
+             C 58 18, 22 74, 22 130
+             C 22 186, 62 222, 120 222
+             C 178 222, 218 186, 218 130
+             C 218 74, 182 18, 120 18 Z"
+          fill="#463225"/>
+
+    <ellipse cx="120" cy="158" rx="56" ry="50" fill="#6b4e3b"/>
+
+    <path d="M74 108 Q 84 100 94 108"
+          stroke="#1a0f08" stroke-width="5"
+          stroke-linecap="round" fill="none"/>
+    <path d="M146 108 Q 156 100 166 108"
+          stroke="#1a0f08" stroke-width="5"
+          stroke-linecap="round" fill="none"/>
+
+    <path d="M88 138
+             C 96 168, 144 168, 152 138
+             C 144 154, 96 154, 88 138 Z"
+          fill="#3a2a1f"/>
+
+    <ellipse cx="120" cy="146" rx="13" ry="10" fill="#e89a9a"/>
+    <ellipse cx="120" cy="144" rx="6" ry="4" fill="#2a1508"/>
+
+    <g stroke="#2a1508" stroke-width="3" stroke-linecap="round">
+      <path d="M34 148
+               C 6 158, 4 202, 32 212
+               C 58 220, 74 196, 62 170
+               C 56 156, 46 148, 34 148 Z"
+            fill="#e89a9a"/>
+      <path d="M14 200 L 8 222"/>
+      <path d="M28 212 L 26 232"/>
+      <path d="M44 214 L 48 232"/>
+    </g>
+
+    <g stroke="#2a1508" stroke-width="3" stroke-linecap="round">
+      <path d="M206 148
+               C 234 158, 236 202, 208 212
+               C 182 220, 166 196, 178 170
+               C 184 156, 194 148, 206 148 Z"
+            fill="#e89a9a"/>
+      <path d="M226 200 L 232 222"/>
+      <path d="M212 212 L 214 232"/>
+      <path d="M196 214 L 192 232"/>
+    </g>
+  </g>
+
+  <!-- ==================== wordmark ==================== -->
+  <!-- No textLength: browsers apply it inconsistently between weights,
+       which was pushing the tagline visibly left of the "k". Instead
+       both texts share the same anchor x so they align cleanly. -->
+
+  <!-- Shifted 8px left of the trail/tagline anchor to compensate for
+       the bold "k" glyph's built-in left sidebearing — brings its
+       visible left edge into optical alignment with the tunnel trail
+       and the "T" of the tagline below. -->
+  <text x="258" y="155"
+        font-family="'Inter', 'Nunito', 'SF Pro Display', 'Segoe UI', system-ui, -apple-system, sans-serif"
+        font-size="150"
+        font-weight="800"
+        fill="#463225">kr<tspan fill="#e89a9a">o</tspan>t</text>
+
+  <!-- ==================== digging trail (izum) ==================== -->
+  <!-- Stylised underground tunnel: a wavy pink stroke beneath the
+       wordmark ending in a small circular exit-hole. Reads as "krot
+       dug through this word". Colour matches the mole's nose/paws. -->
+  <g stroke="#e89a9a" stroke-width="4" stroke-linecap="round" fill="none">
+    <path d="M266 178
+             Q 300 170, 340 178
+             T 420 178
+             T 500 178
+             T 578 178"/>
+  </g>
+  <!-- exit hole -->
+  <circle cx="596" cy="178" r="6"
+          fill="#3a2a1f" stroke="#e89a9a" stroke-width="3"/>
+  <!-- tiny dirt specks along the trail -->
+  <g fill="#e89a9a">
+    <circle cx="298" cy="188" r="1.8"/>
+    <circle cx="378" cy="188" r="1.8"/>
+    <circle cx="458" cy="188" r="1.8"/>
+    <circle cx="538" cy="188" r="1.8"/>
+  </g>
+
+  <!-- ==================== tagline ==================== -->
+  <!-- Anchored at the same x as "krot" so the T aligns with the k. -->
+  <text x="266" y="212"
+        font-family="'Inter', 'SF Pro Text', 'Segoe UI', system-ui, sans-serif"
+        font-size="18"
+        font-weight="600"
+        letter-spacing="5"
+        fill="#8a6a52">TUNNELS THAT DIG</text>
+</svg>

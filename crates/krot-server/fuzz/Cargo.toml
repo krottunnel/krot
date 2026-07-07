@@ -1,0 +1,29 @@
+[package]
+name = "krot-server-fuzz"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+krot-server = { path = ".." }
+tempfile = "3.10"
+
+[[bin]]
+name = "authorized_keys_parse"
+path = "fuzz_targets/authorized_keys_parse.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "tls_client_hello"
+path = "fuzz_targets/tls_client_hello.rs"
+test = false
+doc = false
+bench = false
+
+[workspace]

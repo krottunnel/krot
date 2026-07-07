@@ -1,0 +1,42 @@
+# =============================================================
+# Build artifacts (target/) — never send them to the Docker daemon.
+# =============================================================
+/target/
+**/target/
+**/*.rs.bk
+
+# =============================================================
+# VCS + CI metadata
+# =============================================================
+/.git/
+/.gitignore
+/.github/
+
+# =============================================================
+# Internal / maintainer-only docs — never ship in the image.
+# =============================================================
+/internal/
+
+# =============================================================
+# Public non-runtime docs — not needed in the image itself.
+# (README.md IS included so Docker Hub can render it as the
+#  image description via the release workflow.)
+# =============================================================
+/CHANGELOG.md
+/LICENSE-*
+
+# =============================================================
+# Dev-only tooling
+# =============================================================
+/justfile
+/scripts/
+/assets/
+
+# =============================================================
+# Editor / IDE / runtime state that shouldn't leak into builds
+# =============================================================
+/.claude/
+/.idea/
+/.vscode/
+/var/
+/data/

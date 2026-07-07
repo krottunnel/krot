@@ -1,0 +1,22 @@
+# Auto-normalize every text file to LF on commit, regardless of the
+# platform doing the commit. Prevents CRLF/LF churn when a Windows
+# contributor edits Rust / TOML / Markdown.
+* text=auto eol=lf
+
+# Shell scripts MUST stay LF — CRLF breaks `bash` on Unix with a
+# cryptic "bad interpreter" error.
+*.sh   text eol=lf
+
+# Explicit binaries: no text normalization, no diff attempts.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.woff  binary
+*.woff2 binary
+
+# Assets (logos, wordmark, architecture diagram) are documentation,
+# not project source. Keeps them out of GitHub's language stats so
+# the repo shows as ~100% Rust.
+assets/**  linguist-documentation

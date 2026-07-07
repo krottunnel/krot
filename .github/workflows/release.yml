@@ -1,0 +1,146 @@
+name: release
+
+# Triggered by pushing a tag matching v*.*.*. Builds release binaries
+# for the four supported targets, packages each as a tarball, and
+# creates a GitHub Release with them attached.
+#
+# See RELEASE.md for the surrounding checklist.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+          - target: aarch64-unknown-linux-musl
+            os: ubuntu-latest
+            cross: true
+          # Intel Mac dropped: GitHub's macos-13 runner queue is deep
+          # (5–30 min waits) while Intel is <15% of the Mac install base
+          # in 2026. Intel users can run the aarch64 binary through
+          # Rosetta 2 or `cargo install --git`.
+          - target: aarch64-apple-darwin
+            os: macos-14
+            cross: false
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            cross: false
+          - target: i686-pc-windows-msvc
+            os: windows-latest
+            cross: false
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: release-${{ matrix.target }}
+
+      - name: install cross
+        if: matrix.cross
+        run: cargo install cross --locked
+
+      - name: build (cross)
+        if: matrix.cross
+        run: cross build --release --workspace --target ${{ matrix.target }} --locked
+
+      - name: build (cargo)
+        if: ${{ !matrix.cross }}
+        run: cargo build --release --workspace --target ${{ matrix.target }} --locked
+
+      - name: package (unix)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          STAGE="krot-v${VERSION}-${{ matrix.target }}"
+          mkdir -p "dist/${STAGE}"
+          cp "target/${{ matrix.target }}/release/krot-server" "dist/${STAGE}/"
+          cp "target/${{ matrix.target }}/release/krot" "dist/${STAGE}/"
+          cp LICENSE-MIT LICENSE-APACHE README.md "dist/${STAGE}/"
+          tar -C dist -czf "dist/${STAGE}.tar.gz" "${STAGE}"
+          (cd dist && shasum -a 256 "${STAGE}.tar.gz" > "${STAGE}.tar.gz.sha256")
+
+      - name: package (windows)
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          STAGE="krot-v${VERSION}-${{ matrix.target }}"
+          mkdir -p "dist/${STAGE}"
+          cp "target/${{ matrix.target }}/release/krot-server.exe" "dist/${STAGE}/"
+          cp "target/${{ matrix.target }}/release/krot.exe" "dist/${STAGE}/"
+          cp LICENSE-MIT LICENSE-APACHE README.md "dist/${STAGE}/"
+          (cd dist && 7z a "${STAGE}.zip" "${STAGE}" >/dev/null)
+          (cd dist && sha256sum "${STAGE}.zip" > "${STAGE}.zip.sha256")
+
+      - uses: actions/upload-artifact@v5
+        with:
+          name: krot-${{ matrix.target }}
+          path: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: github release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/download-artifact@v5
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: extract changelog section
+        id: changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          # Awk out the block for [VERSION] up to the next [Section] heading.
+          awk -v ver="$VERSION" '
+            $0 ~ "^## \\["ver"\\]" {flag=1; next}
+            flag && $0 ~ "^## \\[" {flag=0}
+            flag {print}
+          ' CHANGELOG.md > release-body.md
+          if [ ! -s release-body.md ]; then
+            echo "No CHANGELOG.md section for $VERSION — refusing to release." >&2
+            exit 1
+          fi
+
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-body.md
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/*.sha256
+          fail_on_unmatched_files: true
+          draft: false
+          prerelease: false

@@ -1,0 +1,83 @@
+name: docker
+
+# Publishes multi-arch krot-server images to Docker Hub.
+#
+# Triggers:
+#   - tag push `v*.*.*` — publishes `:X.Y.Z`, `:X.Y`, `:latest`.
+#   - manual dispatch  — publishes `:edge` (linux/amd64 only, no README sync).
+#
+# Required repository secrets:
+#   DOCKERHUB_USERNAME — the account or org owning the repo
+#   DOCKERHUB_TOKEN    — a Docker Hub access token (NOT the password)
+#
+# Repository image name is fixed below (`IMAGE_NAME`). Change once,
+# not per-workflow.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: krottunnel/krot-server
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: compute tags & metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+            type=raw,value=edge,enable=${{ github.event_name == 'workflow_dispatch' }}
+          labels: |
+            org.opencontainers.image.title=krot-server
+            org.opencontainers.image.vendor=krottunnel
+            org.opencontainers.image.licenses=MIT OR Apache-2.0
+
+      - name: build & push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          # amd64 always; arm64 only on tag pushes (buildx qemu-arm64
+          # is slow, and manual `edge` builds should be quick).
+          platforms: ${{ startsWith(github.ref, 'refs/tags/v') && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            VCS_REF=${{ github.sha }}
+            BUILD_DATE=${{ steps.meta.outputs.created }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: false
+
+      - name: sync README to Docker Hub
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ env.IMAGE_NAME }}
+          short-description: "Self-hosted tunnel service (QUIC + TLS fallback), Rust, thread-per-core."
+          readme-filepath: ./README-docker.md

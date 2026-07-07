@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 540" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="12">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4a3020"/>
+    </marker>
+    <style>
+      .band  { stroke: #b39a70; stroke-width: 1.5; }
+      .label { fill: #4a3020; font-weight: 800; font-size: 12px; letter-spacing: 1.5px; }
+      .items { fill: #2b1a12; font-size: 13px; }
+      .sub   { fill: #6a5a4a; font-size: 11px; }
+      .line  { stroke: #4a3020; stroke-width: 2; fill: none; }
+      .pink  { fill: #fceeee; }
+      .cream { fill: #f6ede0; }
+      .blue  { fill: #eef3f7; }
+      .divide{ stroke: #b39a70; stroke-width: 1; stroke-dasharray: 3 3; }
+    </style>
+  </defs>
+
+  <!-- ============ Layer 1: LISTENERS ============ -->
+  <rect class="band blue" x="30" y="20" width="660" height="60" rx="8"/>
+  <line class="divide" x1="160" y1="20" x2="160" y2="80"/>
+  <text class="label" x="45" y="46">LISTENERS</text>
+  <text class="sub" x="45" y="66">external</text>
+  <text class="items" x="180" y="46">HTTPS :443/tcp  ·  HTTP :80/tcp  ·  TCP fallback :7853/tcp</text>
+  <text class="items" x="180" y="68">QUIC :7853/udp  ·  Admin API :9700/tcp</text>
+
+  <!-- arrow to layer 2 -->
+  <path class="line" d="M 360 80 L 360 100" marker-end="url(#arrow)"/>
+
+  <!-- ============ Layer 2: TRANSPORT ============ -->
+  <rect class="band cream" x="30" y="104" width="660" height="60" rx="8"/>
+  <line class="divide" x1="160" y1="104" x2="160" y2="164"/>
+  <text class="label" x="45" y="130">TRANSPORT</text>
+  <text class="sub" x="45" y="150">demux</text>
+  <text class="items" x="180" y="130">ALPN dispatcher  ·  QUIC endpoint (SO_REUSEPORT)</text>
+  <text class="items" x="180" y="152">TCP fallback mux  ·  SNI-passthrough  ·  ACME HTTP-01</text>
+
+  <path class="line" d="M 360 164 L 360 184" marker-end="url(#arrow)"/>
+
+  <!-- ============ Layer 3: SECURITY ============ -->
+  <rect class="band cream" x="30" y="188" width="660" height="60" rx="8"/>
+  <line class="divide" x1="160" y1="188" x2="160" y2="248"/>
+  <text class="label" x="45" y="214">SECURITY</text>
+  <text class="sub" x="45" y="234">handshake</text>
+  <text class="items" x="180" y="214">Ed25519 challenge / verify  ·  domain separator</text>
+  <text class="items" x="180" y="236">session tokens  ·  rate-limit gate (per-identity)</text>
+
+  <path class="line" d="M 360 248 L 360 268" marker-end="url(#arrow)"/>
+
+  <!-- ============ Layer 4: ROUTING ============ -->
+  <rect class="band cream" x="30" y="272" width="660" height="60" rx="8"/>
+  <line class="divide" x1="160" y1="272" x2="160" y2="332"/>
+  <text class="label" x="45" y="298">ROUTING</text>
+  <text class="sub" x="45" y="318">dispatch</text>
+  <text class="items" x="180" y="298">TunnelRegistry  ·  Host/SNI → tunnel_id lookup</text>
+  <text class="items" x="180" y="320">HTTP inspector prelude  ·  session resume (30s grace)</text>
+
+  <path class="line" d="M 360 332 L 360 352" marker-end="url(#arrow)"/>
+
+  <!-- ============ Layer 5: WORKERS ============ -->
+  <rect class="band cream" x="30" y="356" width="660" height="60" rx="8"/>
+  <line class="divide" x1="160" y1="356" x2="160" y2="416"/>
+  <text class="label" x="45" y="382">WORKERS</text>
+  <text class="sub" x="45" y="402">thread-per-core</text>
+  <text class="items" x="180" y="382">worker-0  ·  worker-1  ·  worker-N  (one per CPU)</text>
+  <text class="items" x="180" y="404">per-core bandwidth partitions  ·  isolated tokio runtime</text>
+
+  <path class="line" d="M 360 416 L 360 436" marker-end="url(#arrow)"/>
+
+  <!-- ============ Layer 6: STATE ============ -->
+  <rect class="band pink" x="30" y="440" width="660" height="60" rx="8"/>
+  <line class="divide" x1="160" y1="440" x2="160" y2="500"/>
+  <text class="label" x="45" y="466">STATE</text>
+  <text class="sub" x="45" y="486">shared</text>
+  <text class="items" x="180" y="466">authorized_keys  ·  TunnelRegistry snapshot  ·  peers.txt</text>
+  <text class="items" x="180" y="488">rate buckets  ·  ACME cache  ·  admin_token hash</text>
+
+  <!-- Legend -->
+  <text x="30" y="524" font-size="10" fill="#6a5a4a">Traffic flows top-down. Every layer reads shared STATE via lock-free snapshots and hot-reload watchers.</text>
+</svg>
