@@ -1,11 +1,16 @@
 [package]
 name         = "krot-transport"
-description  = "QUIC transport layer for the KROT tunnel protocol."
+description  = "QUIC + TCP-fallback transport for the krot tunnel protocol."
 version      = { workspace = true }
 edition      = { workspace = true }
 rust-version = { workspace = true }
 license      = { workspace = true }
 repository   = { workspace = true }
+homepage     = { workspace = true }
+readme       = "../../README.md"
+documentation = "https://docs.rs/krot-transport"
+keywords     = ["tunnel", "quic", "ngrok", "transport", "self-hosted"]
+categories   = ["network-programming", "asynchronous"]
 
 [lints]
 workspace = true

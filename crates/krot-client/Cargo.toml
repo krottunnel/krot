@@ -1,11 +1,16 @@
 [package]
 name         = "krot-client"
-description  = "KROT client CLI and library."
+description  = "Client CLI and library for krot — self-hosted ngrok alternative in Rust."
 version      = { workspace = true }
 edition      = { workspace = true }
 rust-version = { workspace = true }
 license      = { workspace = true }
 repository   = { workspace = true }
+homepage     = { workspace = true }
+readme       = "../../README.md"
+documentation = "https://docs.rs/krot-client"
+keywords     = ["tunnel", "ngrok", "quic", "self-hosted", "reverse-proxy"]
+categories   = ["network-programming", "command-line-utilities"]
 
 [lints]
 workspace = true

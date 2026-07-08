@@ -1,11 +1,16 @@
 [package]
 name         = "krot-proto"
-description  = "Wire types and framing for the KROT tunnel protocol."
+description  = "Wire types and framing for the krot tunnel protocol (KROT/1)."
 version      = { workspace = true }
 edition      = { workspace = true }
 rust-version = { workspace = true }
 license      = { workspace = true }
 repository   = { workspace = true }
+homepage     = { workspace = true }
+readme       = "../../README.md"
+documentation = "https://docs.rs/krot-proto"
+keywords     = ["tunnel", "ngrok", "quic", "protocol", "self-hosted"]
+categories   = ["network-programming", "encoding"]
 
 [lints]
 workspace = true
